@@ -1,0 +1,56 @@
+---
+- name: "Postges_config -> Create app database"
+  community.postgresql.postgresql_db:
+    state: present
+    name: "{{ item['db_name'] }}"
+  become_user: postgres
+  become: true
+  loop: "{{ databases }}"
+
+- name: "Postges_config -> Create db user"
+  community.postgresql.postgresql_user:
+    state: present
+    name: "{{ item['db_user'] }}"
+    password: "{{ item['db_password'] }}"
+  become_user: postgres
+  become: true
+  loop: "{{ databases }}"
+
+- name: "Postges_config -> Search config file"
+  community.postgresql.postgresql_query:
+    query: SHOW config_file;
+  become_user: postgres
+  become: true
+  register: config_file
+  changed_when: false
+
+- name: "Postges_config -> Allow access from other hosts"
+  ansible.builtin.lineinfile:
+    path: "{{ config_file['query_result'][0]['config_file'] }}"
+    regexp: '^#listen_addresses ='
+    line: "listen_addresses = '*'"
+  become_user: postgres
+  become: true
+  notify: restart postgres
+
+- name: "Postges_config -> Search hba file"
+  community.postgresql.postgresql_query:
+    query: SHOW hba_file;
+  become_user: postgres
+  become: true
+  register: hba_file
+  changed_when: false
+
+- name: "Postges_config -> Allow md5 connection for the db user"
+  community.postgresql.postgresql_pg_hba:
+    dest: "{{ hba_file['query_result'][0]['hba_file'] }}"
+    contype: host
+    databases: "{{ item['db_name'] }}"
+    method: md5
+    users: "{{ item['db_user'] }}"
+    create: true
+    source: "{{ external_ip['ansible_facts']['ipify_public_ip'] }}"
+  become_user: postgres
+  become: true
+  loop: "{{ databases }}"
+  notify: restart postgres

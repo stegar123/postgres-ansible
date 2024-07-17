@@ -1,0 +1,38 @@
+---
+- name: "Postges_table -> Create test_table with several columns"
+  community.postgresql.postgresql_table:
+    name: "{{ item['db_table'] }}"
+    columns:
+    - id bigserial primary key
+    - num bigint
+    - stories text
+    db: "{{ item['db_name'] }}"
+  loop: "{{ databases }}"
+  become: true
+  become_user: postgres
+
+- name: "Postges_table -> Grant db user access to app db"
+  community.postgresql.postgresql_privs:
+    database: "{{ item['db_name'] }}"
+    roles: "{{ item['db_user'] }}"
+    grant_option: yes
+    privs: ALL
+    objs: ALL_IN_SCHEMA
+  become_user: postgres
+  become: true
+  loop: "{{ databases }}"
+
+- name: Postges_table -> Insert query
+  postgresql_query:
+    db: "{{ databases[0]['db_name'] }}"
+    query: "INSERT INTO {{  databases[0]['db_table'] }} (num, stories) VALUES ({{ my_idx }}, '{{ item }}')"
+  loop: 
+    - "{{ lookup('pipe', 'date +%Y%m%d%H%M%SZ') }}"
+    - "{{ lookup('pipe', 'date +%Y%m%d%H%M%SZ') }}"
+    - "{{ lookup('pipe', 'date +%Y%m%d%H%M%SZ') }}"
+    - "{{ lookup('pipe', 'date +%Y%m%d%H%M%SZ') }}"
+    - "{{ lookup('pipe', 'date +%Y%m%d%H%M%SZ') }}"
+  loop_control:
+    index_var: my_idx
+  become_user: postgres
+  become: true

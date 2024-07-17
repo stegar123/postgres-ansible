@@ -1,0 +1,5 @@
+databases:
+  - db_name: "testwindsor"
+    db_table: "testtable"
+    db_user: "testdbuser"
+    db_password: "ver1s2cr2tpassw)rddb"

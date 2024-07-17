@@ -1,0 +1,56 @@
+---
+- name: Configure postgres
+  hosts: postgres
+
+  pre_tasks:
+
+  - name: Fail if the os is not ubuntu 22.04
+    ansible.builtin.fail:
+      msg: The os {{ os_system }} is not supported.
+    when: os_system != "Ubuntu 24.04 LTS"
+    vars:
+      os_system: "{{ ansible_facts['lsb']['description'] }}"
+
+
+  tasks:
+
+  - name: Get my public IP
+    community.general.ipify_facts:
+      timeout: 40
+      validate_certs: 'NO'
+    delegate_to: localhost
+    register: external_ip
+
+  - ansible.builtin.debug:
+      var: external_ip['ansible_facts']['ipify_public_ip']
+
+  - name: include postgres installation
+    ansible.builtin.include_tasks: 
+      tasks/01_install_postgresql.yml
+
+  - name: include postgres configuration
+    ansible.builtin.include_tasks: 
+      tasks/02_config_postgresql.yml
+
+  - name: include firewall config
+    ansible.builtin.include_tasks: 
+      tasks/03_config_firewall.yml
+
+
+
+  handlers:
+
+  - name: restart postgres
+    ansible.builtin.systemd: 
+      name: postgresql 
+      state: restarted
+
+
+- name: Insert data in table
+  hosts: postgres
+  gather_facts: no
+  tasks:
+
+  - name: include create table
+    ansible.builtin.include_tasks: 
+      tasks/04_create_table.yml
