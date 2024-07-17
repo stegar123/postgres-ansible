@@ -18,6 +18,7 @@ Steps:
 7. Connect to database ans check data in testtable table 
    The password you will find in group_vars/postgres
   
+```console
 #psql -h 5.5.5.5  -U testdbuser testwindsor 
 Password for user testdbuser: 
 psql (12.19 (Ubuntu 12.19-0ubuntu0.20.04.1), server 16.3 (Ubuntu 16.3-1.pgdg24.04+1))
@@ -37,7 +38,10 @@ testwindsor=> select * from testtable;
 (5 rows)
 
 testwindsor=> 
- 
+```
+
+   
 Keep in mind:
- a. Passwords are not secured - usually they are pushed into a vault or at least they must be used with Ansible Vault.
- b. All tests were performed using a remote host that is accessible via the internet. Your external IP address will be used to configure the firewall and PostgreSQL.
+
+ 1. Passwords are not secured - usually they are pushed into a vault or at least they must be used with Ansible Vault.
+ 2. All tests were performed using a remote host that is accessible via the internet. Your external IP address will be used to configure the firewall and PostgreSQL.
