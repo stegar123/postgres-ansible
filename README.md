@@ -3,19 +3,23 @@ Steps:
 1. install ansible on management host(make sure to use latest version)
   https://www.cyberciti.biz/faq/how-to-install-and-configure-latest-version-of-ansible-on-ubuntu-linux/    
 
-2. Clone the repository
+2. Clone the repository:
+```console
   git clone https://github.com/stegar123/postgres-ansible.git && cd postgres-ansible
+```
 
-3. Change the ip address and credentials of remote hosts where postrgress will be installed (now is random: 5.5.5.5)
+3. Change the ip address and credentials of remote hosts where postrgress will be installed (now is random: 5.5.5.5)<br />
    file: hosts/inventory
 
 4. Execute playbook
+ ```console
    ansible-playbook postgres-ansible.yml 
+```
 
-5. Install psql on your management host
+5. Install psql on your management host <br />
    Ubuntu package: postgresql-client
    
-7. Connect to database ans check data in testtable table 
+7. Connect to database ans check data in testtable table <br />
    The password you will find in group_vars/postgres
   
 ```console
@@ -43,5 +47,6 @@ testwindsor=>
    
 Keep in mind:
 
- 1. Passwords are not secured - usually they are pushed into a vault or at least they must be used with Ansible Vault.
- 2. All tests were performed using a remote host that is accessible via the internet. Your external IP address will be used to configure the firewall and PostgreSQL.
+ 1. It supported just Ubuntu 22.04
+ 2. Passwords are not secured - usually they are pushed into a vault or at least they must be used with Ansible Vault.
+ 3. All tests were performed using a remote host that is accessible via the internet. Your external IP address will be used to configure the firewall and PostgreSQL.
