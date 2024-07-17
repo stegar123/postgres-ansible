@@ -38,6 +38,6 @@ testwindsor=> select * from testtable;
 
 testwindsor=> 
  
-Keep in minde:
+Keep in mind:
  a. Passwords are not secured - usually they are pushed into a vault or at least they must be used with Ansible Vault.
  b. All tests were performed using a remote host that is accessible via the internet. Your external IP address will be used to configure the firewall and PostgreSQL.
